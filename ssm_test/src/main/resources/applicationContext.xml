@@ -1,0 +1,51 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <!-- 扫描的基本包路径 注解所标注的类，如@Component(组件)，@Service（服务），@Controller（控制器），@Repository（数据仓库）-->
+    <context:component-scan base-package="com.nine.controller"/>
+
+    <context:component-scan base-package="com.nine.service"/>
+
+    <!-- 加载database.properties文件中的内容，database.properties文件中key命名要有一定的特殊规则 -->
+    <context:property-placeholder location="classpath:db.properties" />
+
+    <!-- 配置数据源 ，dbcp -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${driverClassName}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${user}" />
+        <property name="password" value="${password}" />
+        <property name="maxActive" value="${maxActive}" />
+        <property name="maxIdle" value="${maxIdle}" />
+
+    </bean>
+
+    <!-- 从整合包里找，org.mybatis:mybatis-spring:1.2.4 -->
+    <!--sqlsession一级缓存 加载mybatis-config.xml-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 数据库连接池 -->
+        <property name="dataSource" ref="dataSource" />
+        <!-- 加载mybatis的全局配置文件 -->
+        <property name="configLocation" value="classpath:mybatis-config.xml" />
+        <property name="mapperLocations" value="classpath*:com/nine/mapper/*.xml"/>
+
+
+    </bean>
+    <!-- mapper扫描器 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 扫描包路径，如果需要扫描多个包，中间使用半角逗号隔开 -->
+        <property name="basePackage" value="com.nine.mapper"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+        <!-- <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+        会导致数据源配置不管用，数据库连接不上。
+        且spring 4弃用
+        -->
+    </bean>
+
+</beans>
