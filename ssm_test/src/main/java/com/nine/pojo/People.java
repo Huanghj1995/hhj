@@ -12,6 +12,7 @@ public class People {
     public class User {
         //id
         private int id;
+        //git test
         //姓名
         private String name;
         //密码
